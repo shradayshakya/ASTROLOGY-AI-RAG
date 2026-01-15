@@ -1,6 +1,6 @@
 langchain
 langchain-community
-langchain-pinecone
+langchain-pinecone>=0.1.0
 langchain-openai
 langchain-google-genai
 langchain-aws
@@ -12,3 +12,5 @@ timezonefinder
 python-dotenv
 pytz
 requests
+simsimd>=4.4.0
+pytest

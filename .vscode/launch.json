@@ -2,12 +2,47 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Streamlit",
+      "name": "Python: Streamlit (Integrated Terminal)",
       "type": "python",
       "request": "launch",
       "module": "streamlit",
       "args": ["run", "main.py"],
+      "console": "integratedTerminal",
       "jinja": true,
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Ingest BPHS PDF",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/ingest.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Setup LangChain Hub Prompt",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/setup_prompts.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Test API Endpoints (pytest)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/test_api_endpoints.py"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Test Chain (pytest)",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/test_chain.py"],
+      "console": "integratedTerminal",
       "justMyCode": true
     }
   ]
