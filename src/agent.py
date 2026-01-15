@@ -13,10 +13,10 @@ def create_agent_executor(session_id: str):
     llm = get_chat_model()
     tools = [get_d10_chart, get_d9_chart, get_d9_chart_info, get_d1_chart, search_bphs]
 
-    # Pull prompt from LangChain Hub (replace with your repo when ready)
+    import os
+    prompt_repo_path = os.environ.get("VEDIC_RAG_PROMPT_REPO", "shradayshakya/vedic-rag-agent")
     try:
-        prompt = hub.pull("hwchase17/react-chat")
-        # Example: prompt = hub.pull("your-username/vedic-rag-agent")
+        prompt = hub.pull(prompt_repo_path)
     except Exception:
         from langchain.prompts import PromptTemplate
         template = (
