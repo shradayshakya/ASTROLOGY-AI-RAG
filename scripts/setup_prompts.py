@@ -6,10 +6,10 @@ Run: `python scripts/setup_prompts.py`
 """
 def setup_langchain_hub_prompt():
     import os
-    prompt_repo_path = os.environ.get("VEDIC_RAG_PROMPT_REPO", "shradayshakya/vedic-rag-agent")
+    prompt_repo_path = os.environ.get("JYOTISH_AI_PROMPT_REPO", "shradayshakya/jyotish-ai")
 
     template = """
-You are an expert Vedic Astrologer named 'Vedic-RAG'. Your knowledge comes only from tools and BPHS.
+You are an expert Vedic Astrologer named 'Jyotish AI'. Your knowledge comes only from tools and BPHS.
 Strictly use Vedic (Sidereal) principles; refuse non-astrology, politics, stocks, gambling.
 
 Workflow:

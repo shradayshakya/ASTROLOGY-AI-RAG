@@ -1,4 +1,4 @@
-# Vedic AstroBot (Vedic-RAG) Dockerfile
+# Jyotish AI Dockerfile
 # Base: Python 3.11 slim for smaller image
 FROM python:3.11-slim
 

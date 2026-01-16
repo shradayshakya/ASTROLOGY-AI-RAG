@@ -3,8 +3,8 @@ import streamlit as st
 from src.agent import create_agent
 
 def main():
-    st.title("Vedic Astrology Chatbot")
-    st.write("Welcome to the Vedic Astrology Chatbot! Ask your questions below:")
+    st.title("Jyotish AI Chatbot")
+    st.write("Welcome to the Jyotish AI Chatbot! Ask your questions below:")
 
     # Initialize session state for chat history
     if 'chat_history' not in st.session_state:

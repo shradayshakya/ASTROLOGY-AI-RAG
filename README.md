@@ -1,4 +1,4 @@
-# Vedic AstroBot (Vedic-RAG)
+# Jyotish AI (Vedic-RAG)
 
 An Agentic RAG Streamlit application that grounds Vedic astrology responses in two sources:
 
@@ -110,8 +110,8 @@ MongoDB caching keys: `dob+tob+lat+lon+chart_type`. Checks `api_cache` collectio
 Build and run with env:
 
 ```bash
-docker build -t vedic-rag:latest .
-docker run --rm -p 8501:8501 --env-file .env vedic-rag:latest
+docker build -t jyotish-ai:latest .
+docker run --rm -p 8501:8501 --env-file .env jyotish-ai:latest
 ```
 
 Streamlit will be available at http://localhost:8501.

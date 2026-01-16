@@ -1,5 +1,4 @@
 # LangChain Hub Prompt Repo
-VEDIC_RAG_PROMPT_REPO = os.getenv("VEDIC_RAG_PROMPT_REPO", "your-username/vedic-rag-agent")
 import os
 from dotenv import load_dotenv
 
@@ -9,7 +8,8 @@ load_dotenv()
 # LangSmith / LangChain Hub
 LANGCHAIN_TRACING_V2 = os.getenv("LANGCHAIN_TRACING_V2", "true")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
-LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "Vedic-RAG")
+LANGCHAIN_PROJECT = os.getenv("LANGCHAIN_PROJECT", "JYOTISH-AI")
+JYOTISH_AI_PROMPT_REPO = os.getenv("JYOTISH_AI_PROMPT_REPO", "your-username/jyotish-ai")
 
 # LLM Provider: openai | google_genai | bedrock
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
@@ -24,12 +24,12 @@ AWS_REGION_NAME = os.getenv("AWS_REGION_NAME", "us-east-1")
 
 # Pinecone
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "vedic-rag-index")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "jyotish-ai-index")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
 # MongoDB
 MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "vedic_rag_cache")
+MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "jyotish_ai_cache")
 MONGO_CHAT_HISTORY_COLLECTION = os.getenv("MONGO_CHAT_HISTORY_COLLECTION", "chat_history")
 MONGO_API_CACHE_COLLECTION = os.getenv("MONGO_API_CACHE_COLLECTION", "api_cache")
 

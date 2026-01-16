@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from src.agent import create_agent_executor
 from src.config import LANGCHAIN_API_KEY
 
-st.set_page_config(page_title="Vedic AstroBot (Vedic-RAG)", page_icon="🕉️", layout="wide")
+st.set_page_config(page_title="Jyotish AI", page_icon="🕉️", layout="wide")
 
 if not LANGCHAIN_API_KEY:
     st.warning("LANGCHAIN_API_KEY not set. LangSmith tracing disabled.", icon="⚠️")
@@ -22,7 +22,7 @@ if "user_profile" not in st.session_state:
 if "agent_executor" not in st.session_state:
     st.session_state.agent_executor = None
 
-st.title("🕉️ Vedic AstroBot")
+st.title("🕉️ Jyotish AI")
 st.caption("Agentic RAG for Vedic Astrology grounded in BPHS + real astronomical data.")
 
 if not st.session_state.session_id:
