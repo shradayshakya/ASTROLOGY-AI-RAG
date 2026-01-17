@@ -14,3 +14,4 @@ pytz
 requests
 simsimd>=4.4.0
 pytest
+langchain-mongodb
