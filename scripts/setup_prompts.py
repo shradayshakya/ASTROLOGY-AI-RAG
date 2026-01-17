@@ -1,10 +1,12 @@
-from langchain import hub
-from langchain.prompts import PromptTemplate
+
+from langsmith import Client
+from langchain_core.prompts import ChatPromptTemplate
 
 """
 Run: `python scripts/setup_prompts.py`
 """
 def setup_langchain_hub_prompt():
+
     import os
     prompt_repo_path = os.environ.get("JYOTISH_AI_PROMPT_REPO", "shradayshakya/jyotish-ai")
 
@@ -32,10 +34,11 @@ User Input:
 Your Scratchpad:
 {agent_scratchpad}
 """
-    prompt = PromptTemplate.from_template(template)
-    print(f"Pushing prompt to Hub: {prompt_repo_path}")
+    prompt = ChatPromptTemplate.from_template(template)
+    print(f"Pushing prompt to LangSmith: {prompt_repo_path}")
+    client = Client()
     try:
-        hub.push(prompt_repo_path, prompt)
+        client.push_prompt(prompt_repo_path, object=prompt)
         print("Prompt pushed successfully.")
     except Exception as e:
         print("Failed to push prompt:", e)

@@ -1,24 +1,28 @@
-from langchain import hub
+from langsmith import Client
+from langchain_core.prompts import ChatPromptTemplate
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain_community.chat_message_histories import MongoDBChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 from src.llm_factory import get_chat_model
-from src.tools import get_d10_chart, get_d9_chart, get_d9_chart_info, get_d1_chart, search_bphs
+from src.tools import get_d10_chart, get_d9_chart, get_d1_chart, search_bphs
 from src.config import MONGO_URI, MONGO_DB_NAME, MONGO_CHAT_HISTORY_COLLECTION
 
 
 def create_agent_executor(session_id: str):
     """Create an AgentExecutor with tools and chat history bound to session_id."""
     llm = get_chat_model()
-    tools = [get_d10_chart, get_d9_chart, get_d9_chart_info, get_d1_chart, search_bphs]
+    tools = [get_d10_chart, get_d9_chart, get_d1_chart, search_bphs]
+
 
     import os
     prompt_repo_path = os.environ.get("JYOTISH_AI_PROMPT_REPO", "shradayshakya/jyotish-ai")
+    client = Client()
     try:
-        prompt = hub.pull(prompt_repo_path)
+        # Try to load prompt from LangSmith prompt repo
+        prompt_obj = client.get_prompt(prompt_repo_path)
+        prompt = ChatPromptTemplate.from_messages(prompt_obj.messages)
     except Exception:
-        from langchain.prompts import PromptTemplate
         template = (
             """
             You are an expert Vedic Astrologer named 'Jyotish AI'. Your knowledge comes only from tools and BPHS.
@@ -45,7 +49,7 @@ def create_agent_executor(session_id: str):
             {agent_scratchpad}
             """
         )
-        prompt = PromptTemplate.from_template(template)
+        prompt = ChatPromptTemplate.from_template(template)
 
     agent = create_react_agent(llm, tools, prompt)
     executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
