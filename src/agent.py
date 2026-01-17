@@ -3,7 +3,7 @@ from langsmith import Client
 from dataclasses import dataclass
 from langchain.agents import create_agent
 from langchain.tools import tool, ToolRuntime
-from langchain_community.chat_message_histories import MongoDBChatMessageHistory
+from langchain_mongodb import MongoDBChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 from src.tools import get_d10_chart, get_d9_chart, get_d1_chart, search_bphs
