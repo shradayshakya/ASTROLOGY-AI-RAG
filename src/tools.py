@@ -18,8 +18,7 @@ logger = get_logger(__name__)
 
 # -------------------- Configuration Mapping --------------------
 
-# This dictionary maps the internal "Chart Code" to the specific API endpoints.
-# If an SVG endpoint doesn't exist for a chart, we set 'svg': None.
+# This dictionary maps the internal "Chart Code" to the specific data API endpoints.
 CHART_CONFIG = {
     # --- The Big Three ---
     "D1": {
@@ -111,7 +110,7 @@ def _post(url, payload):
             return resp.json()
         except ValueError as e:
             logger.warning(f"Non-JSON response from {url}: {e}")
-            return resp.text  # Handle raw text/SVG responses
+            return resp.text  # Handle raw text responses
     except Exception as e:
         logger.exception(f"HTTP POST error to {url}: {e}")
         return {"error": str(e)}
@@ -127,16 +126,10 @@ def _fetch_chart(dob, tob, lat, lon, tz, chart_type):
     
     # 1. Fetch Data
     data_response = _post(config["data"], payload)
-    
-    # 2. Fetch SVG (if available)
-    svg_response = None
-    if config["svg"]:
-        svg_response = _post(config["svg"], payload)
-    
+
     return {
         "chart_type": chart_type,
-        "chart_data": data_response,
-        "chart_svg": svg_response
+        "chart_data": data_response
     }
 
 
@@ -238,5 +231,11 @@ def get_specific_varga_chart(dob: str, tob: str, city: str, chart_code: str) -> 
 def search_bphs(query: str) -> str:
     """Search BPHS in Pinecone for interpretation rules."""
     retriever = get_pinecone_retriever(top_k=4)
-    docs = retriever.invoke(query)
-    return "\n\n".join([d.page_content for d in docs]) if docs else "No relevant passages found."
+    try:
+        # Use standard retriever API for compatibility across LangChain versions
+        docs = retriever.get_relevant_documents(query)
+        logger.info(f"BPHS search returned {len(docs) if docs else 0} documents")
+        return "\n\n".join([d.page_content for d in docs]) if docs else "No relevant passages found."
+    except Exception as e:
+        logger.exception(f"BPHS search error: {e}")
+        return "No relevant passages found."

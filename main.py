@@ -57,6 +57,16 @@ if not st.session_state.session_id:
 else:
     st.success(f"Session started for **{st.session_state.session_id}**")
     agent_executor = st.session_state.agent_executor
+    if agent_executor is None:
+        app_logger.warning("agent_executor missing in session; recreating")
+        try:
+            agent_executor = create_agent_executor(st.session_state.session_id)
+            st.session_state.agent_executor = agent_executor
+            app_logger.info("agent_executor recreated successfully")
+        except Exception as e:
+            app_logger.exception(f"Failed to create agent_executor: {e}")
+            st.error("Unable to initialize the agent. Please try restarting the session.")
+            st.stop()
 
     # Display previous chat messages (from Mongo history)
     try:
