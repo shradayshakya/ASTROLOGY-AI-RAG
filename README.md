@@ -40,7 +40,7 @@ vedic-rag/
 │   ├── tools.py                            # D1/D9/D10 tools + MongoDB caching + BPHS search
 │   └── agent.py                            # AgentExecutor with tools + chat history
 ├── data/
-│   └── Brihat_Parashara_Hora_Shastra.pdf   # Source PDF (example path)
+│   └── brihat-parashara-hora-shastra-english-v.pdf   # Source PDF (example path)
 └── docs/
     ├── PRD.md
     └── EDD.md
