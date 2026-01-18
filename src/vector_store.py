@@ -14,7 +14,8 @@ def get_pinecone_retriever(top_k: int = 4):
     logger.info("Initializing Pinecone client for retriever")
     _ = Pinecone(api_key=PINECONE_API_KEY)
     embeddings = get_embedding_model()
-    vs = PineconeVectorStore(index_name=PINECONE_INDEX_NAME, embedding=embeddings)
+    # Use the same namespace as ingestion to retrieve documents
+    vs = PineconeVectorStore(index_name=PINECONE_INDEX_NAME, embedding=embeddings, namespace="bphs")
     retriever = vs.as_retriever(search_kwargs={"k": top_k})
     logger.info(f"Retriever initialized with top_k={top_k}")
     return retriever

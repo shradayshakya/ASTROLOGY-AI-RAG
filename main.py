@@ -9,10 +9,10 @@ import logging
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 from src.agent import create_agent_executor
-from src.vector_store import get_pinecone_retriever
 from src.config import LANGCHAIN_API_KEY
 from src.logging_utils import configure_logging, attach_console_handler, get_logger
 from langchain_core.messages import HumanMessage
+# PayloadMetadataCallbackHandler temporarily disabled
 
 configure_logging(logging.INFO)
 attach_console_handler(logging.INFO)
@@ -85,20 +85,11 @@ else:
         with st.chat_message("user"):
             st.markdown(prompt)
         profile = st.session_state.user_profile
-        # Perform BPHS retrieval outside tools and include in prompt context
-        try:
-            retriever = get_pinecone_retriever(top_k=4)
-            bphs_docs = retriever.invoke(prompt)
-            bphs_text = "\n\n".join([d.page_content for d in bphs_docs]) if bphs_docs else ""
-        except Exception as e:
-            app_logger.warning(f"BPHS retrieval failed: {e}")
-            bphs_text = ""
         composed = (
             "User Profile:\n"
             f"DOB: {profile['dob']}\nTime: {profile['tob']}\nCity: {profile['city']}\n\n"
             "User Input:\n"
             f"{prompt}\n\n"
-            + (f"Brihat Parashara Hora Shastra (BPHS):\n{bphs_text}\n" if bphs_text else "")
         )
         with st.chat_message("assistant"):
             with st.spinner("Consulting charts and classical texts..."):

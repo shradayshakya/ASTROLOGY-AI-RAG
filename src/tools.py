@@ -126,6 +126,7 @@ def _fetch_chart(dob, tob, lat, lon, tz, chart_type):
     
     # 1. Fetch Data
     data_response = _post(config["data"], payload)
+    logger.info(f"Fetched {chart_type} chart data for DOB: {dob}, TOB: {tob}, Lat: {lat}, Lon: {lon}")
 
     return {
         "chart_type": chart_type,
@@ -235,7 +236,7 @@ def search_bphs(query: str) -> str:
         # Use standard retriever API for compatibility across LangChain versions
         # VectorStoreRetriever implements BaseRunnable; prefer public invoke()
         docs = retriever.invoke(query)
-        logger.info(f"BPHS search returned {len(docs) if docs else 0} documents")
+        logger.info(f"BPHS search returned {len(docs) if docs else 0} documents with query: {query}")
         return "\n\n".join([d.page_content for d in docs]) if docs else "No relevant passages found."
     except Exception as e:
         logger.exception(f"BPHS search error: {e}")
