@@ -12,7 +12,7 @@ The app collects DOB, TOB, and City, fetches the correct divisional chart (D1/D9
 - Orchestration: LangChain Agent (ReAct) + Tools
 - Frontend: Streamlit `main.py`
 - LLM Factory: OpenAI / Google Gemini / AWS Bedrock (via env `LLM_PROVIDER`)
-- Embeddings: OpenAI or Gemini via `src/embedding_factory.py` (env `EMBEDDING_PROVIDER`)
+- Embeddings: OpenAI / Gemini / Bedrock via `src/embedding_factory.py` (env `EMBEDDING_PROVIDER`)
 - Vector DB: Pinecone (Serverless)
 - Cache & History: MongoDB Atlas (`api_cache`, `chat_history`) using `langchain-mongodb`
 - Prompt Management: LangSmith Prompts (pushed via `scripts/setup_prompts.py`, loaded via Client in `src/agent.py`)
@@ -63,7 +63,7 @@ Copy `.env.example` → `.env` and fill values:
 - `LLM_PROVIDER`: `openai` | `google_genai` | `bedrock`
 - `OPENAI_API_KEY` / `GOOGLE_API_KEY` / AWS creds
 - `PINECONE_API_KEY`, `PINECONE_INDEX_NAME`
-- `EMBEDDING_PROVIDER`: `openai` | `gemini`
+- `EMBEDDING_PROVIDER`: `openai` | `gemini` | `bedrock`
 - `MONGO_URI`, `MONGO_DB_NAME`, `MONGO_API_CACHE_COLLECTION`, `MONGO_CHAT_HISTORY_COLLECTION`
 - `FREE_ASTROLOGY_API_KEY`
 - `LANGCHAIN_API_KEY` (LangSmith tracing)
@@ -82,6 +82,7 @@ Embedding model selection is controlled by `EMBEDDING_PROVIDER`:
 
 - `openai` → `text-embedding-3-small` (dimension 1536)
 - `gemini` → `models/text-embedding-004` (dimension 768)
+- `bedrock` → `amazon.titan-embed-text-v2:0` (dimension 1024; uses `AWS_REGION_NAME`, optional `AWS_PROFILE`)
 
 On free tiers, ingestion uses batching with short sleeps to avoid rate limits.
 

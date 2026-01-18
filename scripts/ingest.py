@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore
-from src.embedding_factory import get_embedding_model
+from src.embedding_factory import get_embedding_model, get_embedding_dimension
 from pinecone import Pinecone, ServerlessSpec
 from src.logging_utils import configure_logging, get_logger, log_call, log_operation
 
@@ -43,11 +43,9 @@ def ingest_data(pdf_path: str = "data/Brihat_Parashara_Hora_Shastra.pdf") -> Opt
     with log_operation(_logger, "pinecone_client_init"):
         pc = Pinecone(api_key=PINECONE_API_KEY)
     
-    # Check Provider to determine Dimensions
-    # Gemini = 768, OpenAI = 1536
-    provider = os.getenv("EMBEDDING_PROVIDER", "gemini").lower()
-    dimension = 768 if provider == "gemini" else 1536
-    _logger.info(f"Embedding provider={provider} dimension={dimension}")
+    # Determine index dimension via embedding_factory
+    dimension = get_embedding_dimension()
+    _logger.info(f"Embedding dimension selected: {dimension}")
     
     if PINECONE_INDEX_NAME not in pc.list_indexes().names():
         _logger.info(f"Creating Index '{PINECONE_INDEX_NAME}' with dimension {dimension}...")
