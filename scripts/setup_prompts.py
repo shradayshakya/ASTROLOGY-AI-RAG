@@ -1,14 +1,21 @@
 
 from langsmith import Client
 from langchain_core.prompts import ChatPromptTemplate
+from src.logging_utils import configure_logging, get_logger, log_call, log_operation
 
 """
 Run: `python scripts/setup_prompts.py`
 """
 def setup_langchain_hub_prompt():
-
+    configure_logging()
+    logger = get_logger(__name__)
+    logger.info("Preparing to push prompt to LangSmith")
+    
+    
+    @log_call
+    def _push_prompt():
     import os
-    prompt_repo_path = os.environ.get("JYOTISH_AI_PROMPT_REPO", "shradayshakya/jyotish-ai")
+    prompt_repo_path = os.environ.get("JYOTISH_AI_PROMPT_REPO", "jyotish-ai")
 
     template = """
 You are an expert Vedic Astrologer named 'Jyotish AI'. Your knowledge comes only from tools and BPHS.
@@ -35,13 +42,16 @@ Your Scratchpad:
 {agent_scratchpad}
 """
     prompt = ChatPromptTemplate.from_template(template)
-    print(f"Pushing prompt to LangSmith: {prompt_repo_path}")
+    logger.info(f"Pushing prompt to LangSmith: {prompt_repo_path}")
     client = Client()
     try:
-        client.push_prompt(prompt_repo_path, object=prompt)
-        print("Prompt pushed successfully.")
+        with log_operation(logger, "push_prompt"):
+            client.push_prompt(prompt_repo_path, object=prompt)
+        logger.info("Prompt pushed successfully.")
     except Exception as e:
-        print("Failed to push prompt:", e)
+        logger.exception(f"Failed to push prompt: {e}")
+    
+    _push_prompt()
 
 
 if __name__ == "__main__":

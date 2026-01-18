@@ -2,14 +2,19 @@ from src.config import LLM_PROVIDER, OPENAI_API_KEY, GOOGLE_API_KEY, AWS_REGION_
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_aws import ChatBedrock
+from src.logging_utils import get_logger, log_call
+
+logger = get_logger(__name__)
 
 
+@log_call
 def get_chat_model():
     """
     Factory Method to return a ChatModel based on LLM_PROVIDER.
     Supports: OpenAI GPT-4.1-nano, Google Gemini 3 Pro Preview, AWS Bedrock Nova Lite.
     """
     provider = LLM_PROVIDER.lower()
+    logger.info(f"Selecting chat model provider: {provider}")
 
     if provider == "openai":
         return ChatOpenAI(model="gpt-4.1-nano", temperature=0, api_key=OPENAI_API_KEY)

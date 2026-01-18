@@ -3,17 +3,24 @@ import sys
 import re
 from datetime import datetime
 import streamlit as st
+import logging
 
 # Ensure src is importable when launching via Streamlit
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 from src.agent import create_agent_executor
 from src.config import LANGCHAIN_API_KEY
+from src.logging_utils import configure_logging, attach_console_handler, get_logger
 
+configure_logging(logging.INFO)
+attach_console_handler(logging.INFO)
+app_logger = get_logger(__name__)
+app_logger.info("Initializing Jyotish AI Streamlit app")
 st.set_page_config(page_title="Jyotish AI", page_icon="🕉️", layout="wide")
 
 if not LANGCHAIN_API_KEY:
     st.warning("LANGCHAIN_API_KEY not set. LangSmith tracing disabled.", icon="⚠️")
+    app_logger.warning("LANGCHAIN_API_KEY not set; LangSmith tracing disabled.")
 
 # Initialize session state
 if "session_id" not in st.session_state:
@@ -36,6 +43,7 @@ if not st.session_state.session_id:
         submitted = st.form_submit_button("Start Session")
         if submitted:
             if email and dob and tob and city:
+                app_logger.info("Starting session and creating agent executor")
                 st.session_state.session_id = email
                 st.session_state.user_profile = {
                     "dob": dob.strftime("%Y-%m-%d"),
@@ -56,8 +64,8 @@ else:
         for msg in history.messages:
             with st.chat_message(msg.type):
                 st.markdown(msg.content, unsafe_allow_html=True)
-    except Exception:
-        pass
+    except Exception as e:
+        app_logger.warning(f"Failed to load chat history: {e}")
 
     # Chat input
     prompt = st.chat_input("Ask about career (D10), marriage (D9), or health (D1)...")
@@ -91,7 +99,9 @@ else:
                     if retry_secs:
                         friendly += " Try again tomorrow."
                     st.warning(friendly)
+                    app_logger.exception(f"Agent invocation failed: {e}")
 
     if st.button("End Session"):
+        app_logger.info("Ending session and clearing state")
         st.session_state.clear()
         st.rerun()

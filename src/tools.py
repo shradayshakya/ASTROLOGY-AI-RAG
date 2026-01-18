@@ -5,6 +5,7 @@ from functools import wraps
 import requests
 from pymongo import MongoClient
 from langchain.tools import tool
+from src.logging_utils import get_logger, log_call
 
 from src.config import (
     MONGO_URI, MONGO_DB_NAME, MONGO_API_CACHE_COLLECTION,
@@ -12,6 +13,8 @@ from src.config import (
 )
 from src.utils import get_lat_lon_offset
 from src.vector_store import get_pinecone_retriever
+
+logger = get_logger(__name__)
 
 # -------------------- Configuration Mapping --------------------
 
@@ -106,9 +109,11 @@ def _post(url, payload):
         resp.raise_for_status()
         try:
             return resp.json()
-        except ValueError:
+        except ValueError as e:
+            logger.warning(f"Non-JSON response from {url}: {e}")
             return resp.text  # Handle raw text/SVG responses
     except Exception as e:
+        logger.exception(f"HTTP POST error to {url}: {e}")
         return {"error": str(e)}
 
 @mongo_cache
@@ -146,6 +151,7 @@ def _tool_impl(dob, tob, city, chart_type):
             return {"error": f"Could not geocode city: {city}"}
         return _fetch_chart(dob=dob, tob=tob, lat=lat, lon=lon, tz=tz, chart_type=chart_type)
     except Exception as e:
+        logger.exception(f"Tool implementation error for chart_type={chart_type}: {e}")
         return {"error": f"Tool error: {e}"}
 
 # --- PRIMARY TOOLS (The Big 3) ---
