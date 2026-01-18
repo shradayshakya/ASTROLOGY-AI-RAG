@@ -107,7 +107,41 @@ else:
                         {"messages": [HumanMessage(content=composed)]},
                         {"configurable": {"session_id": st.session_state.session_id}},
                     )
-                    output = resp.get("output") if isinstance(resp, dict) else resp
+                    def _block_text(content):
+                        if isinstance(content, str):
+                            return content
+                        if isinstance(content, list):
+                            parts = []
+                            for b in content:
+                                if isinstance(b, dict):
+                                    t = b.get("text")
+                                    if isinstance(t, str):
+                                        parts.append(t)
+                            return "\n".join(parts) if parts else str(content)
+                        return str(content)
+
+                    def _extract_output(r):
+                        if isinstance(r, dict):
+                            out = r.get("output")
+                            if isinstance(out, str) and out:
+                                return out
+                            msgs = r.get("messages")
+                            if isinstance(msgs, list) and msgs:
+                                try:
+                                    from langchain_core.messages import AIMessage
+                                except Exception:
+                                    AIMessage = None
+                                for m in reversed(msgs):
+                                    if AIMessage is not None and isinstance(m, AIMessage):
+                                        return _block_text(m.content)
+                                    if isinstance(m, dict) and (m.get("type") == "ai" or m.get("role") == "assistant"):
+                                        return _block_text(m.get("content"))
+                            return str(r)
+                        if hasattr(r, "content"):
+                            return _block_text(getattr(r, "content"))
+                        return str(r)
+
+                    output = _extract_output(resp)
                     st.markdown(output or "Sorry, I encountered an error.", unsafe_allow_html=True)
                 except Exception as e:
                     msg = str(e)
