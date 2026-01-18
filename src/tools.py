@@ -222,7 +222,7 @@ def get_specific_varga_chart(dob: str, tob: str, city: str, chart_code: str) -> 
     - city (str): City Name
     - chart_code (str): One of [D3, D4, D5, D6, D8, D11, D12, D16, D20, D27, D30, D40, D45, D60]
     """
-    valid_codes = [k for k in CHART_CONFIG.keys()]
+    valid_codes = list(CHART_CONFIG.keys())
     if chart_code.upper() not in valid_codes:
         return {"error": f"Invalid Chart Code. Supported: {valid_codes}"}
     
@@ -232,5 +232,5 @@ def get_specific_varga_chart(dob: str, tob: str, city: str, chart_code: str) -> 
 def search_bphs(query: str) -> str:
     """Search BPHS in Pinecone for interpretation rules."""
     retriever = get_pinecone_retriever(top_k=4)
-    docs = retriever.get_relevant_documents(query)
+    docs = retriever.invoke(query)
     return "\n\n".join([d.page_content for d in docs]) if docs else "No relevant passages found."

@@ -1,82 +1,88 @@
 import os
 import sys
+import time
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore
-from langchain_openai import OpenAIEmbeddings
+from src.embedding_factory import get_embedding_model
 from pinecone import Pinecone, ServerlessSpec
 
 # Add the parent directory to the system path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from src.config import PINECONE_API_KEY, PINECONE_INDEX_NAME, EMBEDDING_MODEL
+from src.config import PINECONE_API_KEY, PINECONE_INDEX_NAME 
 
 # Load environment variables from .env file
 load_dotenv()
 
-def ingest_data(pdf_path: str = "data/BPHS.pdf"):
-    """
-    Loads a PDF, splits it into chunks, and ingests it into a Pinecone index.
 
-    Args:
-        pdf_path (str): The path to the PDF file to ingest.
-    """
+def ingest_data(pdf_path: str = "data/Brihat_Parashara_Hora_Shastra.pdf"):
+    # 1. Load and Split
     if not os.path.exists(pdf_path):
-        print(f"Error: PDF file not found at {pdf_path}")
+        print(f"Error: PDF not found at {pdf_path}")
         return
 
-    print(f"Loading data from {pdf_path}...")
+    print("Loading PDF...")
     loader = PyPDFLoader(pdf_path)
-    documents = loader.load()
-
-    if not documents:
-        print("No documents loaded from the PDF. Check the file content.")
-        return
-
-    print(f"Loaded {len(documents)} documents. Splitting text...")
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    docs = text_splitter.split_documents(documents)
-
-    print(f"Split into {len(docs)} chunks. Initializing Pinecone...")
+    raw_docs = loader.load()
     
+    print(f"Splitting {len(raw_docs)} pages...")
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    docs = text_splitter.split_documents(raw_docs)
+    print(f"Total Chunks to process: {len(docs)}")
+
+    # 2. Configure Pinecone
     pc = Pinecone(api_key=PINECONE_API_KEY)
     
-    # Check if the index already exists
+    # Check Provider to determine Dimensions
+    # Gemini = 768, OpenAI = 1536
+    provider = os.getenv("EMBEDDING_PROVIDER", "gemini").lower()
+    dimension = 768 if provider == "gemini" else 1536
+    
     if PINECONE_INDEX_NAME not in pc.list_indexes().names():
-        print(f"Creating new serverless index: {PINECONE_INDEX_NAME}")
-        # Determine index dimension for common OpenAI embedding models
-        # Defaults: ada-002 = 1536, text-embedding-3-small = 1536, text-embedding-3-large = 3072
-        dim_map = {
-            "text-embedding-ada-002": 1536,
-            "text-embedding-3-small": 1536,
-            "text-embedding-3-large": 3072,
-        }
-        index_dim = dim_map.get(EMBEDDING_MODEL, 1536)
-
+        print(f"Creating Index '{PINECONE_INDEX_NAME}' with dimension {dimension}...")
         pc.create_index(
             name=PINECONE_INDEX_NAME,
-            dimension=index_dim,
+            dimension=dimension, 
             metric='cosine',
-            spec=ServerlessSpec(
-                cloud='aws',
-                region='us-east-1'
-            )
+            spec=ServerlessSpec(cloud='aws', region='us-east-1')
         )
     else:
-        print(f"Index '{PINECONE_INDEX_NAME}' already exists.")
+        # Verify dimension matches
+        index_info = pc.describe_index(PINECONE_INDEX_NAME)
+        if index_info.dimension != dimension:
+            print(f"CRITICAL ERROR: Index dimension is {index_info.dimension}, but model uses {dimension}.")
+            print("Please delete the index in Pinecone console and run this script again.")
+            return
 
-    print("Initializing embeddings and vector store...")
-    # Use the same embedding model for ingestion and retrieval
-    embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
+    # 3. Batch Ingestion with Sleep (The 'Free Tier' Fix)
+    embeddings = get_embedding_model()
     
-    # Ingest data into Pinecone
-    PineconeVectorStore.from_documents(
-        docs, embeddings, index_name=PINECONE_INDEX_NAME
-    )
+    # We ingest in small batches (e.g., 20 chunks) and sleep to avoid 429 Errors
+    batch_size = 20 
+    total_docs = len(docs)
     
-    print("\n--- Ingestion Complete ---")
-    print(f"Successfully ingested {len(docs)} chunks into the '{PINECONE_INDEX_NAME}' index.")
+    print(f"Starting ingestion with batch size {batch_size}...")
+    
+    for i in range(0, total_docs, batch_size):
+        batch = docs[i : i + batch_size]
+        print(f"Processing batch {i} to {i+len(batch)} / {total_docs}...")
+        
+        try:
+            PineconeVectorStore.from_documents(
+                documents=batch,
+                embedding=embeddings,
+                index_name=PINECONE_INDEX_NAME
+            )
+            # SLEEP for 2 seconds between batches to respect Free Tier limits
+            time.sleep(2) 
+        except Exception as e:
+            print(f"Error on batch {i}: {e}")
+            # If rate limit hit, wait longer and try continuing
+            time.sleep(10)
+
+    print("Ingestion Complete!")
 
 if __name__ == "__main__":
     ingest_data()

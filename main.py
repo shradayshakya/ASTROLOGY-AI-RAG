@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 from datetime import datetime
 import streamlit as st
 
@@ -70,13 +71,26 @@ else:
         )
         with st.chat_message("assistant"):
             with st.spinner("Consulting charts and classical texts..."):
-                resp = agent_executor.invoke(
-                    {"input": composed},
-                    {"configurable": {"session_id": st.session_state.session_id}},
-                )
-                output = resp.get("output") if isinstance(resp, dict) else resp
-                # Crucial: render SVG using markdown unsafe_html
-                st.markdown(output or "Sorry, I encountered an error.", unsafe_allow_html=True)
+                try:
+                    resp = agent_executor.invoke(
+                        {"messages": [{"role": "user", "content": composed}]},
+                        {"configurable": {"session_id": st.session_state.session_id}},
+                    )
+                    output = resp.get("output") if isinstance(resp, dict) else resp
+                    st.markdown(output or "Sorry, I encountered an error.", unsafe_allow_html=True)
+                except Exception as e:
+                    msg = str(e)
+                    retry_secs = None
+                    m = re.search(r"retry in\s*([\d\.]+)s", msg, re.IGNORECASE)
+                    if m:
+                        try:
+                            retry_secs = int(float(m.group(1)))
+                        except Exception:
+                            retry_secs = None
+                    friendly = "The Jyotish AI is meditating now, come back later for deeper insights."
+                    if retry_secs:
+                        friendly += " Try again tomorrow."
+                    st.warning(friendly)
 
     if st.button("End Session"):
         st.session_state.clear()

@@ -22,10 +22,11 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_SESSION_TOKEN = os.getenv("AWS_SESSION_TOKEN")
 AWS_REGION_NAME = os.getenv("AWS_REGION_NAME", "us-east-1")
 
-# Pinecone
+
+# Pinecone & Embeddings
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "jyotish-ai-index")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "gemini")
 
 # MongoDB
 MONGO_URI = os.getenv("MONGO_URI")
