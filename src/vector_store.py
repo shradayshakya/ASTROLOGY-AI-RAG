@@ -16,6 +16,12 @@ def get_pinecone_retriever(top_k: int = 4):
     embeddings = get_embedding_model()
     # Use the same namespace as ingestion to retrieve documents
     vs = PineconeVectorStore(index_name=PINECONE_INDEX_NAME, embedding=embeddings, namespace="bphs")
-    retriever = vs.as_retriever(search_kwargs={"k": top_k})
+    retriever = vs.as_retriever(search_kwargs={"k": top_k}).with_config(
+        {
+            "run_name": f"Retrieve • BPHS (Pinecone:{PINECONE_INDEX_NAME})",
+            "tags": ["retriever", "pinecone", "corpus:bphs"],
+            "metadata": {"index": PINECONE_INDEX_NAME, "k": top_k},
+        }
+    )
     logger.info(f"Retriever initialized with top_k={top_k}")
     return retriever

@@ -150,7 +150,7 @@ def _tool_impl(dob, tob, city, chart_type):
 
 # --- PRIMARY TOOLS (The Big 3) ---
 
-@tool("get_d10_chart")
+@tool("chart_d10_career")
 def get_d10_chart(dob: str, tob: str, city: str) -> dict:
     """
     Fetches Dasamsa (D10) chart. 
@@ -159,7 +159,7 @@ def get_d10_chart(dob: str, tob: str, city: str) -> dict:
     """
     return _tool_impl(dob, tob, city, "D10")
 
-@tool("get_d9_chart")
+@tool("chart_d9_marriage")
 def get_d9_chart(dob: str, tob: str, city: str) -> dict:
     """
     Fetches Navamsa (D9) chart. 
@@ -168,7 +168,7 @@ def get_d9_chart(dob: str, tob: str, city: str) -> dict:
     """
     return _tool_impl(dob, tob, city, "D9")
 
-@tool("get_d1_chart")
+@tool("chart_d1_general_health")
 def get_d1_chart(dob: str, tob: str, city: str) -> dict:
     """
     Fetches Rasi (D1) / Planetary Chart.
@@ -179,7 +179,7 @@ def get_d1_chart(dob: str, tob: str, city: str) -> dict:
 
 # --- SECONDARY TOOLS (Wealth, Progeny, etc.) ---
 
-@tool("get_d2_chart")
+@tool("chart_d2_wealth_hora")
 def get_d2_chart(dob: str, tob: str, city: str) -> dict:
     """
     Fetches Hora (D2) chart. 
@@ -188,7 +188,7 @@ def get_d2_chart(dob: str, tob: str, city: str) -> dict:
     """
     return _tool_impl(dob, tob, city, "D2")
 
-@tool("get_d7_chart")
+@tool("chart_d7_progeny_saptamsa")
 def get_d7_chart(dob: str, tob: str, city: str) -> dict:
     """
     Fetches Saptamsa (D7) chart. 
@@ -197,7 +197,7 @@ def get_d7_chart(dob: str, tob: str, city: str) -> dict:
     """
     return _tool_impl(dob, tob, city, "D7")
 
-@tool("get_d24_chart")
+@tool("chart_d24_education_siddhamsa")
 def get_d24_chart(dob: str, tob: str, city: str) -> dict:
     """
     Fetches Siddhamsa (D24) chart. 
@@ -208,7 +208,7 @@ def get_d24_chart(dob: str, tob: str, city: str) -> dict:
 
 # --- GENERAL FETCHER (Advanced) ---
 
-@tool("get_specific_varga_chart")
+@tool("chart_varga_specific")
 def get_specific_varga_chart(dob: str, tob: str, city: str, chart_code: str) -> dict:
     """
     Fetches any specific Divisional Chart by its code.
@@ -228,7 +228,7 @@ def get_specific_varga_chart(dob: str, tob: str, city: str, chart_code: str) -> 
     
     return _tool_impl(dob, tob, city, chart_code.upper())
 
-@tool("search_bphs")
+@tool("bphs_search_pinecone")
 def search_bphs(query: str) -> str:
     """Search BPHS in Pinecone for interpretation rules."""
     retriever = get_pinecone_retriever(top_k=4)

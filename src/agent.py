@@ -69,6 +69,12 @@ def create_agent_executor(session_id: str):
         ),
         input_messages_key="messages",
         history_messages_key="chat_history",
+    ).with_config(
+        {
+            "run_name": f"Agent • Jyotish AI (session:{session_id})",
+            "tags": ["agent", "jyotish-ai"],
+            "metadata": {"session_id": session_id},
+        }
     )
     logger.info("Agent wrapped with MongoDB chat history")
 
