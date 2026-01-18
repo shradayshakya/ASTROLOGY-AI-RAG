@@ -233,7 +233,8 @@ def search_bphs(query: str) -> str:
     retriever = get_pinecone_retriever(top_k=4)
     try:
         # Use standard retriever API for compatibility across LangChain versions
-        docs = retriever.get_relevant_documents(query)
+        # VectorStoreRetriever implements BaseRunnable; prefer public invoke()
+        docs = retriever.invoke(query)
         logger.info(f"BPHS search returned {len(docs) if docs else 0} documents")
         return "\n\n".join([d.page_content for d in docs]) if docs else "No relevant passages found."
     except Exception as e:
