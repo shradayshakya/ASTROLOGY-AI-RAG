@@ -9,7 +9,8 @@ from src.prompt_utils import get_prompt_content
 
 from src.tools import (
     get_d10_chart, get_d9_chart, get_d1_chart, get_d2_chart, get_d7_chart, get_d24_chart,
-    get_specific_varga_chart, search_bphs
+    get_d3_chart, get_d4_chart, get_d12_chart, get_d16_chart, get_d20_chart, get_d30_chart, get_d60_chart,
+    search_bphs
 )
 from src.config import MONGO_URI, MONGO_DB_NAME, MONGO_CHAT_HISTORY_COLLECTION
 from src.logging_utils import get_logger, log_call
@@ -49,7 +50,14 @@ def create_agent_executor(session_id: str):
             get_d2_chart,
             get_d7_chart,
             get_d24_chart,
-            get_specific_varga_chart,
+            # Newly added explicit varga tools
+            get_d3_chart,
+            get_d4_chart,
+            get_d12_chart,
+            get_d16_chart,
+            get_d20_chart,
+            get_d30_chart,
+            get_d60_chart,
             # Pinecone BPHS search tool for RAG context
             search_bphs,
         ],
@@ -71,7 +79,7 @@ def create_agent_executor(session_id: str):
         history_messages_key="chat_history",
     ).with_config(
         {
-            "run_name": f"Agent • Jyotish AI (session:{session_id})",
+            "run_name": "Agent • Jyotish AI",
             "tags": ["agent", "jyotish-ai"],
             "metadata": {"session_id": session_id},
         }

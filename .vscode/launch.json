@@ -35,15 +35,6 @@
       "args": ["tests/test_api_endpoints.py"],
       "console": "integratedTerminal",
       "justMyCode": true
-    },
-    {
-      "name": "Python: Test Chain (pytest)",
-      "type": "python",
-      "request": "launch",
-      "module": "pytest",
-      "args": ["tests/test_chain.py"],
-      "console": "integratedTerminal",
-      "justMyCode": true
     }
   ]
 }

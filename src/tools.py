@@ -33,12 +33,13 @@ CHART_CONFIG = {
     },
     
     # --- Wealth & Family ---
+    "D2": { "data": "https://json.freeastrologyapi.com/d2-chart-info"},
     "D3": { "data": "https://json.freeastrologyapi.com/d3-chart-info"},
     "D4": { "data": "https://json.freeastrologyapi.com/d4-chart-info"},
     
     # --- Progeny & Health ---
-    "D7": { "data": "https://json.freeastrologyapi.com/d7-chart-info"},
     "D6": { "data": "https://json.freeastrologyapi.com/d6-chart-info"},
+    "D7": { "data": "https://json.freeastrologyapi.com/d7-chart-info"},
     "D8": { "data": "https://json.freeastrologyapi.com/d8-chart-info"},
     
     # --- Advanced / Spiritual ---
@@ -188,6 +189,24 @@ def get_d2_chart(dob: str, tob: str, city: str) -> dict:
     """
     return _tool_impl(dob, tob, city, "D2")
 
+@tool("chart_d3_siblings_drekkana")
+def get_d3_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Drekkana (D3) chart.
+    USE CASE: Siblings, courage, initiative.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D3")
+
+@tool("chart_d4_property_chaturthamsa")
+def get_d4_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Chaturthamsa (D4) chart.
+    USE CASE: Property, land, happiness/fortune.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D4")
+
 @tool("chart_d7_progeny_saptamsa")
 def get_d7_chart(dob: str, tob: str, city: str) -> dict:
     """
@@ -205,6 +224,51 @@ def get_d24_chart(dob: str, tob: str, city: str) -> dict:
     ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
     """
     return _tool_impl(dob, tob, city, "D24")
+
+@tool("chart_d12_parents_dwadasamsa")
+def get_d12_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Dwadasamsa (D12) chart.
+    USE CASE: Parents, grandparents, lineage.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D12")
+
+@tool("chart_d16_vehicles_shodasamsa")
+def get_d16_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Shodasamsa (D16) chart.
+    USE CASE: Vehicles, comforts, luxuries.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D16")
+
+@tool("chart_d20_spirituality_vimsamsa")
+def get_d20_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Vimsamsa (D20) chart.
+    USE CASE: Spiritual progress, worship, religious involvement.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D20")
+
+@tool("chart_d30_misfortunes_trimsamsa")
+def get_d30_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Trimsamsa (D30) chart.
+    USE CASE: Misfortunes, diseases, punishments.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D30")
+
+@tool("chart_d60_pastkarma_shashtiamsa")
+def get_d60_chart(dob: str, tob: str, city: str) -> dict:
+    """
+    Fetches Shashtiamsa (D60) chart.
+    USE CASE: Past karma, deep-seated tendencies.
+    ARGS: dob (YYYY-MM-DD), tob (HH:MM), city (str).
+    """
+    return _tool_impl(dob, tob, city, "D60")
 
 # --- GENERAL FETCHER (Advanced) ---
 
