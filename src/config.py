@@ -39,3 +39,6 @@ FREE_ASTROLOGY_API_KEY = os.getenv("FREE_ASTROLOGY_API_KEY")
 ASTRO_OBSERVATION_POINT = os.getenv("ASTRO_OBSERVATION_POINT", "topocentric")
 ASTRO_AYANAMSHA = os.getenv("ASTRO_AYANAMSHA", "lahiri")
 ASTRO_LANGUAGE = os.getenv("ASTRO_LANGUAGE", "en")
+
+# Application Settings
+APP_PASSWORD = os.getenv("APP_PASSWORD", "admin123")  # Default password; should be changed

@@ -10,6 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 from src.agent import create_agent_executor
 from src.config import LANGCHAIN_API_KEY
+from src.auth import get_active_password, hash_password
 from src.logging_utils import configure_logging, attach_console_handler, get_logger
 from langchain_core.messages import HumanMessage
 # PayloadMetadataCallbackHandler temporarily disabled
@@ -23,6 +24,29 @@ st.set_page_config(page_title="Jyotish AI", page_icon="🕉️", layout="wide")
 if not LANGCHAIN_API_KEY:
     st.warning("LANGCHAIN_API_KEY not set. LangSmith tracing disabled.", icon="⚠️")
     app_logger.warning("LANGCHAIN_API_KEY not set; LangSmith tracing disabled.")
+
+# --- AUTHENTICATION LOGIC START ---
+if "authenticated" not in st.session_state:
+    st.session_state["authenticated"] = False
+
+if not st.session_state["authenticated"]:
+    st.title("🔒 Access Restricted")
+    st.write("Please enter the password to access the Vedic Astrologer.")
+
+    password_input = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        active_password_hash = get_active_password()
+        if hash_password(password_input or "") == active_password_hash:
+            st.session_state["authenticated"] = True
+            st.success("Access Granted!")
+            st.rerun()  # Reload the app to show the actual content
+        else:
+            st.error("Incorrect Password. Please try again.")
+
+    # Stop the script here if not authenticated
+    st.stop()
+# --- AUTHENTICATION LOGIC END ---
 
 # Initialize session state
 if "session_id" not in st.session_state:
