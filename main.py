@@ -12,7 +12,7 @@ from src.agent import create_agent_executor
 from src.config import LANGCHAIN_API_KEY
 from src.auth import get_active_password, hash_password
 from src.logging_utils import configure_logging, attach_console_handler, get_logger
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 # PayloadMetadataCallbackHandler temporarily disabled
 
 configure_logging(logging.INFO)
@@ -97,9 +97,70 @@ else:
     # Display previous chat messages (from Mongo history)
     try:
         history = agent_executor.get_session_history(st.session_state.session_id)
+
+        def _msg_block_text(content):
+            if isinstance(content, str):
+                return content
+            if isinstance(content, list):
+                parts = []
+                for b in content:
+                    if isinstance(b, dict):
+                        t = b.get("text")
+                        if isinstance(t, str):
+                            parts.append(t)
+                    elif isinstance(b, str):
+                        parts.append(b)
+                return "\n".join(parts) if parts else str(content)
+            return str(content)
+
+        def _sanitize_and_capture_thinking(text):
+            if not isinstance(text, str):
+                return "", []
+            pattern = re.compile(r"<thinking>(.*?)</thinking>", flags=re.DOTALL | re.IGNORECASE)
+            segments = [m.strip() for m in pattern.findall(text)]
+            cleaned = pattern.sub("", text)
+            return cleaned.strip(), segments
+
+        tool_notes_buffer = []
         for msg in history.messages:
-            with st.chat_message(msg.type):
-                st.markdown(msg.content, unsafe_allow_html=True)
+            # Skip rendering ToolMessage bubble; buffer for next AIMessage expander
+            if isinstance(msg, ToolMessage):
+                tool_notes_buffer.append(_msg_block_text(getattr(msg, "content", "")))
+                continue
+            # Human/user message
+            if isinstance(msg, HumanMessage):
+                text = _msg_block_text(getattr(msg, "content", ""))
+                if text:
+                    with st.chat_message("user"):
+                        st.markdown(text, unsafe_allow_html=True)
+                continue
+            # Assistant message with hidden notes
+            if isinstance(msg, AIMessage):
+                raw = _msg_block_text(getattr(msg, "content", ""))
+                sanitized, thinking_notes = _sanitize_and_capture_thinking(raw)
+                with st.chat_message("assistant"):
+                    if sanitized:
+                        st.markdown(sanitized, unsafe_allow_html=True)
+                    if thinking_notes or tool_notes_buffer:
+                        with st.expander("Show assistant notes", expanded=False):
+                            if thinking_notes:
+                                st.markdown("**Hidden reasoning**")
+                                for seg in thinking_notes:
+                                    st.code(seg)
+                            if tool_notes_buffer:
+                                st.markdown("**Tool outputs**")
+                                for note in tool_notes_buffer:
+                                    try:
+                                        import json
+                                        parsed = json.loads(note)
+                                        st.json(parsed)
+                                    except Exception:
+                                        st.code(str(note))
+                    tool_notes_buffer = []
+                continue
+            # Fallback for unknown message types
+            with st.chat_message(getattr(msg, "type", "assistant")):
+                st.markdown(_msg_block_text(getattr(msg, "content", "")), unsafe_allow_html=True)
     except Exception as e:
         app_logger.warning(f"Failed to load chat history: {e}")
 
@@ -143,11 +204,11 @@ else:
                             msgs = r.get("messages")
                             if isinstance(msgs, list) and msgs:
                                 try:
-                                    from langchain_core.messages import AIMessage
+                                    from langchain_core.messages import AIMessage as ai_message_cls
                                 except Exception:
-                                    AIMessage = None
+                                    ai_message_cls = None
                                 for m in reversed(msgs):
-                                    if AIMessage is not None and isinstance(m, AIMessage):
+                                    if ai_message_cls is not None and isinstance(m, ai_message_cls):
                                         return _block_text(m.content)
                                     if isinstance(m, dict) and (m.get("type") == "ai" or m.get("role") == "assistant"):
                                         return _block_text(m.get("content"))
@@ -157,7 +218,13 @@ else:
                         return str(r)
 
                     output = _extract_output(resp)
-                    st.markdown(output or "Sorry, I encountered an error.", unsafe_allow_html=True)
+                    sanitized_out, thinking_notes_out = _sanitize_and_capture_thinking(output)
+                    st.markdown(sanitized_out or "Sorry, I encountered an error.", unsafe_allow_html=True)
+                    if thinking_notes_out:
+                        with st.expander("Show assistant notes", expanded=False):
+                            st.markdown("**Hidden reasoning**")
+                            for seg in thinking_notes_out:
+                                st.code(seg)
                 except Exception as e:
                     msg = str(e)
                     retry_secs = None
