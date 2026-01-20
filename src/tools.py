@@ -146,8 +146,14 @@ def _tool_impl(dob, tob, city, chart_type):
                 return s
             s = str(s).strip()
             s = html.unescape(s)
-            if len(s) >= 2 and ((s[0] == "'" and s[-1] == "'") or (s[0] == '"' and s[-1] == '"')):
-                s = s[1:-1].strip()
+            # Strip common enclosing wrappers like quotes, parentheses, brackets, and braces
+            wrappers = [("'", "'"), ('"', '"'), ('(', ')'), ('[', ']'), ('{', '}')]
+            # Keep stripping while the string is surrounded by any known wrapper pair
+            while len(s) >= 2 and any(s.startswith(l) and s.endswith(r) for l, r in wrappers):
+                for l, r in wrappers:
+                    if s.startswith(l) and s.endswith(r):
+                        s = s[1:-1].strip()
+                        break
             return s
 
         dob_s = _sanitize_str(dob)
