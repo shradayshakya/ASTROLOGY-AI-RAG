@@ -3,6 +3,7 @@ import hashlib
 from datetime import datetime, timezone
 from functools import wraps
 import requests
+import html
 from pymongo import MongoClient
 from langchain.tools import tool
 from src.logging_utils import get_logger, log_call
@@ -140,11 +141,37 @@ def _fetch_chart(dob, tob, lat, lon, tz, chart_type):
 def _tool_impl(dob, tob, city, chart_type):
     """Common logic for all chart tools."""
     try:
-        date_obj = datetime.strptime(dob, "%Y-%m-%d")
-        lat, lon, tz = get_lat_lon_offset(city, date_obj)
+        def _sanitize_str(s):
+            if s is None:
+                return s
+            s = str(s).strip()
+            s = html.unescape(s)
+            if len(s) >= 2 and ((s[0] == "'" and s[-1] == "'") or (s[0] == '"' and s[-1] == '"')):
+                s = s[1:-1].strip()
+            return s
+
+        dob_s = _sanitize_str(dob)
+        tob_s = _sanitize_str(tob)
+        city_s = _sanitize_str(city)
+
+        try:
+            date_obj = datetime.strptime(dob_s, "%Y-%m-%d")
+        except ValueError:
+            for fmt in ("%Y/%m/%d", "%d-%m-%Y", "%m/%d/%Y"):
+                try:
+                    date_obj = datetime.strptime(dob_s, fmt)
+                    # Normalize to canonical string for downstream payload
+                    dob_s = date_obj.strftime("%Y-%m-%d")
+                    break
+                except ValueError:
+                    continue
+            else:
+                raise
+
+        lat, lon, tz = get_lat_lon_offset(city_s, date_obj)
         if lat is None:
-            return {"error": f"Could not geocode city: {city}"}
-        return _fetch_chart(dob=dob, tob=tob, lat=lat, lon=lon, tz=tz, chart_type=chart_type)
+            return {"error": f"Could not geocode city: {city_s}"}
+        return _fetch_chart(dob=dob_s, tob=tob_s, lat=lat, lon=lon, tz=tz, chart_type=chart_type)
     except Exception as e:
         logger.exception(f"Tool implementation error for chart_type={chart_type}: {e}")
         return {"error": f"Tool error: {e}"}
