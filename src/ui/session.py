@@ -21,17 +21,19 @@ def render_session_form_and_create_agent(app_logger):
             dob = st.date_input("Date of Birth", value=datetime(1990, 1, 1))
             tob = st.time_input("Time of Birth")
             city = st.text_input("City of Birth (e.g., 'New Delhi, India')")
+            gender = st.selectbox("Gender", options=["Male", "Female", "Other"], index=2)
             submitted = st.form_submit_button("Start Session")
             if submitted:
-                if email and dob and tob and city:
+                if email and dob and tob and city and gender:
                     app_logger.info("Starting session and creating agent executor")
                     st.session_state.session_id = email
                     st.session_state.user_profile = {
                         "dob": dob.strftime("%Y-%m-%d"),
                         "tob": tob.strftime("%H:%M"),
                         "city": city,
+                        "gender": gender,
                     }
-                    st.session_state.agent_executor = create_agent_executor(st.session_state.session_id)
+                    st.session_state.agent_executor = create_agent_executor(st.session_state.session_id, gender)
                     st.rerun()
                 else:
                     st.error("Please fill in all fields.")
@@ -42,7 +44,12 @@ def get_or_create_agent_executor(session_id, app_logger):
     if agent_executor is None:
         app_logger.warning("agent_executor missing in session; recreating")
         try:
-            agent_executor = create_agent_executor(session_id)
+            gender = None
+            if "user_profile" in st.session_state and st.session_state.user_profile:
+                gender = st.session_state.user_profile.get("gender")
+            if not gender:
+                gender = "Other"
+            agent_executor = create_agent_executor(session_id, gender)
             st.session_state.agent_executor = agent_executor
             app_logger.info("agent_executor recreated successfully")
         except Exception as e:

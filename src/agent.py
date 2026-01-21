@@ -24,18 +24,30 @@ class AstrologyContext:
 logger = get_logger(__name__)
 
 @log_call
-def create_agent_executor(session_id: str):
+def create_agent_executor(session_id: str, gender: str):
     """Create an agent with tools and chat history bound to session_id."""
     import os
     prompt_repo_path = os.environ.get("JYOTISH_AI_PROMPT_REPO", "jyotish-ai")
     try:
         logger.info("Fetching system prompt via prompt_utils.get_prompt_content")
         system_prompt = get_prompt_content(prompt_repo_path)
+        # Try to inject gender into template if placeholder exists
+        try:
+            system_prompt = system_prompt.format(gender=gender)
+        except Exception:
+            # If formatting fails (no placeholder), append a clear context line
+            system_prompt = (
+                system_prompt
+                + f"\nContext: The user is {gender}. Consider this when interpreting specific Dashas or planetary placements."
+            )
     except Exception as e:
         logger.warning(f"Failed to fetch prompt from LangSmith: {e}. Falling back to default.")
         system_prompt = (
             "You are an expert Vedic Astrologer named 'Jyotish AI'. Your knowledge comes only from tools and BPHS.\n"
             "Strictly use Vedic (Sidereal) principles; refuse non-astrology, politics, stocks, gambling."
+        )
+        system_prompt += (
+            f"\nContext: The user is {gender}. Consider this when interpreting specific Dashas or planetary placements."
         )
 
     from src.llm_factory import get_chat_model
