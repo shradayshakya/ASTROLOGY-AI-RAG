@@ -27,12 +27,12 @@ def get_chat_model():
         )
 
     if provider in ("google_genai", "gemini"):
-        model = ChatGoogleGenerativeAI(model="gemini-3-pro-preview", google_api_key=GOOGLE_API_KEY)
+        model = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=GOOGLE_API_KEY)
         return model.with_config(
             {
-                "run_name": "LLM • Google Gemini 3 Pro (preview)",
-                "tags": ["llm", "provider:google"],
-                "metadata": {"model": "gemini-3-pro-preview"},
+                "run_name": "LLM • Google Gemini 2.5 Flash",
+                "tags": ["llm", "provider:google_genai"],
+                "metadata": {"model": "gemini-2.5-flash"},
             }
         )
 

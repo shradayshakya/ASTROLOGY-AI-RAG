@@ -14,7 +14,8 @@ def get_embedding_model():
     provider = os.getenv("EMBEDDING_PROVIDER", "gemini").lower()
     logger.info(f"Selecting embedding provider: {provider}")
     if provider == "openai":
-        return OpenAIEmbeddings(model="text-embedding-3-small")
+        api_key = os.getenv("OPENAI_API_KEY")
+        return OpenAIEmbeddings(model="text-embedding-3-small", api_key=api_key)
     elif provider == "gemini":
         return GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
     elif provider == "bedrock":
