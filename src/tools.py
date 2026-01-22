@@ -23,39 +23,39 @@ logger = get_logger(__name__)
 CHART_CONFIG = {
     # --- The Big Three ---
     "D1": {
-        "data": "https://json.freeastrologyapi.com/planets/planets", 
+        "data": "https://json.freeastrologyapi.com/planets", 
     },
     "D9": {
-        "data": "https://json.freeastrologyapi.com/planets/navamsa-chart-info", 
+        "data": "https://json.freeastrologyapi.com/navamsa-chart-info", 
     },
     "D10": {
-        "data": "https://json.freeastrologyapi.com/planets/d10-chart-info", 
+        "data": "https://json.freeastrologyapi.com/d10-chart-info", 
     },
     
     # --- Wealth & Family ---
-    "D2": { "data": "https://json.freeastrologyapi.com/planets/d2-chart-info"},
-    "D3": { "data": "https://json.freeastrologyapi.com/planets/d3-chart-info"},
-    "D4": { "data": "https://json.freeastrologyapi.com/planets/d4-chart-info"},
+    "D2": { "data": "https://json.freeastrologyapi.com/d2-chart-info"},
+    "D3": { "data": "https://json.freeastrologyapi.com/d3-chart-info"},
+    "D4": { "data": "https://json.freeastrologyapi.com/d4-chart-info"},
     
     # --- Progeny & Health ---
-    "D6": { "data": "https://json.freeastrologyapi.com/planets/d6-chart-info"},
-    "D7": { "data": "https://json.freeastrologyapi.com/planets/d7-chart-info"},
-    "D8": { "data": "https://json.freeastrologyapi.com/planets/d8-chart-info"},
+    "D6": { "data": "https://json.freeastrologyapi.com/d6-chart-info"},
+    "D7": { "data": "https://json.freeastrologyapi.com/d7-chart-info"},
+    "D8": { "data": "https://json.freeastrologyapi.com/d8-chart-info"},
     
     # --- Advanced / Spiritual ---
-    "D5":  { "data": "https://json.freeastrologyapi.com/planets/d5-chart-info"},
-    "D11": { "data": "https://json.freeastrologyapi.com/planets/d11-chart-info"},
-    "D12": { "data": "https://json.freeastrologyapi.com/planets/d12-chart-info"},
-    "D16": { "data": "https://json.freeastrologyapi.com/planets/d16-chart-info"},
-    "D20": { "data": "https://json.freeastrologyapi.com/planets/d20-chart-info"},
-    "D24": { "data": "https://json.freeastrologyapi.com/planets/d24-chart-info"},
-    "D27": { "data": "https://json.freeastrologyapi.com/planets/d27-chart-info"},
-    "D30": { "data": "https://json.freeastrologyapi.com/planets/d30-chart-info"},
+    "D5":  { "data": "https://json.freeastrologyapi.com/d5-chart-info"},
+    "D11": { "data": "https://json.freeastrologyapi.com/d11-chart-info"},
+    "D12": { "data": "https://json.freeastrologyapi.com/d12-chart-info"},
+    "D16": { "data": "https://json.freeastrologyapi.com/d16-chart-info"},
+    "D20": { "data": "https://json.freeastrologyapi.com/d20-chart-info"},
+    "D24": { "data": "https://json.freeastrologyapi.com/d24-chart-info"},
+    "D27": { "data": "https://json.freeastrologyapi.com/d27-chart-info"},
+    "D30": { "data": "https://json.freeastrologyapi.com/d30-chart-info"},
     
     # --- Esoteric / Karmic ---
-    "D40": { "data": "https://json.freeastrologyapi.com/planets/d40-chart-info"},
-    "D45": { "data": "https://json.freeastrologyapi.com/planets/d45-chart-info"},
-    "D60": { "data": "https://json.freeastrologyapi.com/planets/d60-chart-info"},
+    "D40": { "data": "https://json.freeastrologyapi.com/d40-chart-info"},
+    "D45": { "data": "https://json.freeastrologyapi.com/d45-chart-info"},
+    "D60": { "data": "https://json.freeastrologyapi.com/d60-chart-info"},
 }
 
 
