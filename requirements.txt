@@ -1,5 +1,6 @@
 langchain
 langchain-community
+langchain-text-splitters
 langchain-pinecone>=0.1.0
 langchain-openai
 langchain-google-genai
@@ -16,3 +17,4 @@ simsimd>=4.4.0
 pytest
 langchain-mongodb
 pypdf
+tiktoken

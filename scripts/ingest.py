@@ -4,12 +4,7 @@ import time
 from typing import Optional
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
-# Prefer token-based splitting; fallback to character splitter
-try:
-    from langchain_text_splitters import TokenTextSplitter
-except ImportError:
-    TokenTextSplitter = None
-from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_pinecone import PineconeVectorStore
 
 # Ensure the project root is on sys.path so 'src.*' imports work when running as a script
@@ -44,33 +39,26 @@ def ingest_data(pdf_path: str = "data/brihat-parashara-hora-shastra-english-v.pd
         raw_docs = loader.load()
     
     _logger.info(f"Splitting {len(raw_docs)} pages...")
-    # Configure splitter: token-based if available, else character-based
-    splitter_info = "TokenTextSplitter" if TokenTextSplitter else "RecursiveCharacterTextSplitter"
-    _logger.info(f"Using splitter: {splitter_info}")
-    if TokenTextSplitter:
-        text_splitter = TokenTextSplitter(chunk_size=1000, chunk_overlap=100)
-        # Split per page to preserve metadata faithfully
-        with log_operation(_logger, "split_documents_token"):
-            docs = []
-            for d in raw_docs:
-                chunks = text_splitter.split_text(d.page_content)
-                page = d.metadata.get("page")
-                src = d.metadata.get("source")
-                for idx, ch in enumerate(chunks):
-                    docs.append(
-                        type(d)(
-                            page_content=ch,
-                            metadata={**d.metadata, "page": page, "source": src, "chunk_index": idx},
-                        )
+
+    _logger.info("Using splitter: RecursiveCharacterTextSplitter.from_tiktoken_encoder")
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        chunk_size=1000,
+        chunk_overlap=100,
+    )
+    # Split per page to preserve metadata faithfully
+    with log_operation(_logger, "split_documents_token"):
+        docs = []
+        for d in raw_docs:
+            chunks = text_splitter.split_text(d.page_content)
+            page = d.metadata.get("page")
+            src = d.metadata.get("source")
+            for idx, ch in enumerate(chunks):
+                docs.append(
+                    type(d)(
+                        page_content=ch,
+                        metadata={**d.metadata, "page": page, "source": src, "chunk_index": idx},
                     )
-    else:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        with log_operation(_logger, "split_documents_char"):
-            docs = text_splitter.split_documents(raw_docs)
-            # Ensure chunk_index metadata exists for deterministic IDs
-            for idx, d in enumerate(docs):
-                if "chunk_index" not in d.metadata:
-                    d.metadata["chunk_index"] = idx
+                )
     _logger.info(f"Total Chunks to process: {len(docs)}")
 
     # 2. Configure Pinecone
