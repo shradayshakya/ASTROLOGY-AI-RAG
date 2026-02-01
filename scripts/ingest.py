@@ -43,7 +43,7 @@ def ingest_data(pdf_path: str = "data/brihat-parashara-hora-shastra-english-v.pd
     _logger.info("Using splitter: RecursiveCharacterTextSplitter.from_tiktoken_encoder")
     text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         chunk_size=1000,
-        chunk_overlap=100,
+        chunk_overlap=0,
     )
     # Split per page to preserve metadata faithfully
     with log_operation(_logger, "split_documents_token"):
